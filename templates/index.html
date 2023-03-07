@@ -5,13 +5,29 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
         $(document).ready(function(){
-          load_data();
-          function load_data(query)
+          function return_page(){
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page') || 1;
+            return page
+          }
+
+          // function windows_adding_search_params(search){
+          //   const urlParams = new URLSearchParams(window.location.search);
+          //   var string_add = "?query="+search
+          //   if(urlParams.get('page') !== null){
+          //     string_add = "&query="+search
+          //   }
+          //   var url = document.location.href+string_add;
+          //   document.location = url;
+          // }
+
+          load_data({page: return_page()});
+          function load_data(params_dict)
           {
            $.ajax({
             url:"/products",
             method:"POST",
-            data:{query:query},
+            data:params_dict,
             success:function(data)
             {
               $('#result').html(data);
@@ -19,12 +35,15 @@
             }
            });
           }
+
           $('#search_text').keyup(function(){
             var search = $(this).val();
+            const page = return_page()
             if(search != ''){
-            load_data(search);
+              // windows_adding_search_params(search)
+              load_data({query: search,page:page});
            }else{
-            load_data();
+            load_data({page: page});
            }
           });
         });

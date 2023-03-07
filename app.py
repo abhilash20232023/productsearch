@@ -5,28 +5,31 @@ import pandas as pd
 import json
 
 app = Flask(__name__)
-app.config["CACHE_TYPE"] = "SimpleCache" # better not use this type w. gunicorn
+app.config["CACHE_TYPE"] = "SimpleCache"
 cache = Cache(app)
 
-@app.route("/")
-def index():
-    return render_template('index.html')
 
 @app.route("/products",methods=["POST","GET"])
 def product():
     search = None
-    if request.method == 'POST':
-        if cache.get('wallmart_data') is None:
-            data = pd.read_csv("product_walmart_data.csv")
-            data = data[["Uniq Id","Product Name","List Price","Description","Category"]]
-            cache.set("wallmart_data", data)
-        else:
-            data = cache.get("wallmart_data")
-        if len(request.form.keys()) > 0:
-            search = request.form['query']
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-        if search is not None:
-            data = data[data["Product Name"].str.lower().str.find(search) > 0 ]
+    page = 1
+    if request.method == 'GET':
+        return render_template('index.html')
+    elif request.method == 'POST':
+        # This is for caching the data
+        data = cache_data(
+            'wallmart_data',
+            "product_walmart_data.csv",
+            ["Uniq Id","Product Name","List Price","Description","Category"]
+            )
+        
+        # parsing the arguments and assign to a variable
+        arguments = parse_arguments(request.form)
+        search, page = arguments['query'], arguments['page']
+
+        # if search key present then search for the data
+        data = search_function(search, data)
+
         if len(data) > 0:
             pagination = Pagination(page=page, total=(len(data)//10) ,record_name='Products')
             start_page = (page - 1) * 10
@@ -35,8 +38,59 @@ def product():
             return jsonify({'htmlresponse': render_template("product.html",
                 products=json.loads(product_data.to_json(orient='records')),
                 pagination=pagination)})
-        else:
-            pagination = Pagination(page=0, total=0 ,record_name='Products')
-            return jsonify({'htmlresponse': render_template("product.html",
-                products=[],
-                pagination=pagination)})
+    
+        pagination = Pagination(page=0, total=0 ,record_name='Products')
+        return jsonify({'htmlresponse': render_template("product.html",
+            products=[],
+            pagination=pagination)})
+        
+
+"""
+This function caches data and returns cached data
+
+arguments:
+    cache_key: str (key for caching data)
+    file_name: str (name of the file for cahing)
+    columns: [] (list of columns which are used for caching)
+retuns:
+    data: df (dataframe)
+"""
+def cache_data(cache_key, file_name, columns):
+    if cache.get(cache_key) is None:
+        data = pd.read_csv(file_name)
+        data = data[columns]
+        cache.set(cache_key, data)
+    else:
+        data = cache.get(cache_key)
+    return data
+
+
+"""
+This function parses the arguments and return with default values
+
+arguments:
+    arguments: dict (dictionary of arguments)
+retuns:
+    default_args: dict (arguments with default values)
+"""
+def parse_arguments(arguments):
+    default_args = {'query': None, 'page': 1}
+    for key, value in arguments.items():
+        if key == 'page':
+            value = int(value)
+        default_args[key] = value
+    return default_args
+
+"""
+This function returns search results based on key it is normal find string in the key words
+
+arguments:
+    search: str
+    data: dataframe ()
+retuns:
+    data: dataframe
+"""
+def search_function(search, data):
+    if search is not None:
+        data = data[data["Product Name"].str.lower().str.find(search) > 0 ]
+    return data
