@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mainpage.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          load_data();
+          function load_data(query)
+          {
+           $.ajax({
+            url:"/products",
+            method:"POST",
+            data:{query:query},
+            success:function(data)
+            {
+              $('#result').html(data);
+              $("#result").empty().append(data.htmlresponse);
+            }
+           });
+          }
+          $('#search_text').keyup(function(){
+            var search = $(this).val();
+            if(search != ''){
+            load_data(search);
+           }else{
+            load_data();
+           }
+          });
+        });
+        </script>
+  </head>
+<body>
+<div class="container" >
+        <input type="text" class="example" name="search_text" id="search_text" placeholder="Search.." name="search">
+        <!-- <button type="submit"><i class="fa fa-search"></i></button> -->
+    <div id="result">
+
+    </div>
+</div>
+</body>
+</html>

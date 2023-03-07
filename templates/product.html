@@ -1,0 +1,38 @@
+{% if products|length > 0 %}
+    {% for p in products %}
+        <div class="col-xs-12 col-md-6 bootstrap snippets bootdeys">
+            <!-- product -->
+            <div class="product-content product-wrap clearfix">
+                <div class="row">
+                        <div class="col-md-5 col-sm-12 col-xs-12">
+                            <div class="product-image"> 
+                                <img src="https://www.bootdey.com/image/194x228/87CEFA" alt="194x228" class="img-responsive"> 
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-7 col-sm-12 col-xs-12">
+                        <div class="product-deatil">
+                                <h5 class="name">
+                                    <a href="/product/{{ p['Uniq Id'] }}">
+                                        {{ p["Product Name"] }} <span>{{ p["Category"] }} </span>
+                                    </a>
+                                </h5>
+                                <p class="price-container">
+                                    <span>$ {{ p["List Price"] }}</span>
+                                </p>
+                                <span class="tag1"></span> 
+                        </div>
+                        <div class="description">
+                            <p>{{ p.Description[:40] }} ..</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end product -->
+        </div>
+    {% endfor %}
+{% else %}
+        <p> No results found</p>
+{% endif %}
+    {{ pagination.info }}
+    {{ pagination.links }}
