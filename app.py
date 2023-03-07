@@ -8,6 +8,17 @@ app = Flask(__name__)
 app.config["CACHE_TYPE"] = "SimpleCache"
 cache = Cache(app)
 
+@app.route("/product/<p_id>",methods=["GET"])
+def product_listing(p_id):
+    data = cache_data(
+            'wallmart_data',
+            "product_walmart_data.csv",
+            ["Uniq Id","Product Name","List Price","Description","Category"]
+            )
+    product_listing = data[data["Uniq Id"] == p_id]
+    if len(product_listing) >0:
+        return render_template('product_list.html', products= json.loads(product_listing.iloc[0].to_json()))
+
 
 @app.route("/products",methods=["POST","GET"])
 def product():

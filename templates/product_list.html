@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mainpage.css') }}">
+  </head>
+  <body>
+  <div class="container" >
+        <div class="col-xs-12 col-md-6 bootstrap snippets bootdeys">
+        <!-- product -->
+                <div class="product-content product-wrap clearfix">
+                    <div class="row">
+                            <div class="col-md-5 col-sm-12 col-xs-12">
+                                <div class="product-image">
+                                        <img src="/static/images/static_image.png" alt="194x228" class="img-responsive"> 
+                                </div>
+                            </div>
+                            <div class="col-md-7 col-sm-12 col-xs-12">
+                            <div class="product-deatil">
+                                    <h5 class="name">
+                                            {{ products["Product Name"] }} <span>{{ products["Category"] }} </span>
+                                    </h5>
+                                    <p class="price-container">
+                                        <span>$ {{ products["List Price"] }}</span>
+                                    </p>
+                                    <span class="tag1"></span> 
+                            </div>
+                            <div class="description">
+                                <p>{{ products.Description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <!-- end product -->
+        </div>
+    </div>
+</body>
+</html> 
